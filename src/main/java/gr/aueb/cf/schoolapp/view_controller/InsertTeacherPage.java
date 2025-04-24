@@ -48,9 +48,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
-import static com.sun.java.accessibility.util.AWTEventMonitor.addWindowListener;
-
 public class InsertTeacherPage extends JFrame {
+
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	private JTextField firstnameText;
@@ -77,7 +76,6 @@ public class InsertTeacherPage extends JFrame {
 		addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowActivated(WindowEvent e) {
-
 				try {
 					cityService.getAllCities().forEach(cityComboBox::addItem);
 				} catch (SQLException ex) {
@@ -167,7 +165,7 @@ public class InsertTeacherPage extends JFrame {
 				String inputLastname;
 				inputLastname = lastnameText.getText().trim();
 
-				errorLastname.setText(inputLastname.equals("") ? "Το επώνυμο είναι υποχρεωτικό" : "");
+				errorLastname.setText(inputLastname.isEmpty() ? "Το επώνυμο είναι υποχρεωτικό" : "");
 			}
 		});
 
@@ -274,13 +272,14 @@ public class InsertTeacherPage extends JFrame {
 		JButton insertBtn = new JButton("Υποβολή");
 		insertBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				TeacherReadOnlyDTO teacherReadOnlyDTO;
+				TeacherInsertDTO insertDTO;
 
 				// Data Binding
-				TeacherInsertDTO insertDTO = doDataBinding();
-				TeacherReadOnlyDTO teacherReadOnlyDTO;
+				insertDTO = doDataBinding();
 
 				// Validation
-				Map<String, String> errors = TeacherValidator.validate(insertDTO);
+				Map<String , String > errors = TeacherValidator.validate(insertDTO);
 				if (!errors.isEmpty()) {
 					errorFirstname.setText(errors.getOrDefault("firstname", ""));
 					errorLastname.setText(errors.getOrDefault("lastname", ""));
@@ -292,8 +291,7 @@ public class InsertTeacherPage extends JFrame {
 					JOptionPane.showMessageDialog(null, "Teacher with uuid: " + teacherReadOnlyDTO.getUuid(), "Insert", JOptionPane.INFORMATION_MESSAGE);
 					// todo form instead of message dialog
 				} catch (TeacherDAOException | TeacherAlreadyExistsException ex) {
-					JOptionPane.showMessageDialog(null, "Error" + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-
+					JOptionPane.showMessageDialog(null, "Error. " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		});
@@ -307,8 +305,8 @@ public class InsertTeacherPage extends JFrame {
 		JButton closeBtn = new JButton("Κλείσιμο");
 		closeBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				Main.getInsertTeacherPage().setVisible(false);
 				Main.getDashboard().setEnabled(true);
+				Main.getInsertTeacherPage().setVisible(false);
 			}
 		});
 
@@ -320,13 +318,13 @@ public class InsertTeacherPage extends JFrame {
 	}
 
 	private List<City> fetchCitiesFromDatabase() {
-		String sql = "SELECT * FROM cities order by name asc";
-		List<City> cities = new ArrayList();
-
-//		Connection connection = Dashboard.getConnection();
+//		String sql = "SELECT * FROM cities order by name asc";
+//		List<City> cities = new ArrayList();
+//
+//		//Connection connection = Dashboard.getConnection();
 //
 //		try (Connection connection = DBUtil.getConnection();
-//				PreparedStatement ps = connection.prepareStatement(sql)) {
+//			 PreparedStatement ps = connection.prepareStatement(sql)) {
 //
 //
 //			ResultSet rs = ps.executeQuery();
@@ -340,10 +338,10 @@ public class InsertTeacherPage extends JFrame {
 //			}
 //
 //		} catch (SQLException e) {
-//			JOptionPane.showMessageDialog(null, "Select cities error", "Error", JOptionPane.ERROR_MESSAGE);
+//			JOptionPane.showMessageDialog(null,  "Select cities error", "Error", JOptionPane.ERROR_MESSAGE);
 //		}
 //		return cities;
-		return  null;
+		return null;
 	}
 
 	private TeacherInsertDTO doDataBinding() {
@@ -360,7 +358,6 @@ public class InsertTeacherPage extends JFrame {
 		int cityId = (selectedCity != null) ? selectedCity.getId() : DEFAULT_CITY_ID;
 		String zipcode = zipcodeText.getText().trim();
 
-		return new TeacherInsertDTO(firstname, lastname, vat, fathername, phoneNumber,
-				email, street, streetNumber, zipcode, cityId);
+		return new TeacherInsertDTO(firstname, lastname, vat, fathername, phoneNumber, email, street, streetNumber, zipcode, cityId);
 	}
 }
