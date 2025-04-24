@@ -124,6 +124,24 @@ public class TeacherServiceImpl implements ITeacherService{
 
     @Override
     public List<TeacherReadOnlyDTO> getTeachersByLastName(String lastname) throws TeacherDAOException {
-        return List.of();
+        List<Teacher> teachers;
+        try {
+            teachers = teacherDAO.getByLastname(lastname);
+
+            // Option 1
+//            return teachers.stream()
+//                    .map(Mapper::mapTeacherToReadOnlyDTO)
+//                    .flatMap(Optional::stream)
+//                    .collect(Collectors.toList());
+
+            // Option 2
+            return teachers.stream()
+                    .map(t -> Mapper.mapTeacherToReadOnlyDTO(t).orElse(null))
+                    .collect(Collectors.toList());
+
+        } catch (TeacherDAOException e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 }
