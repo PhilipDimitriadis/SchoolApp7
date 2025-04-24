@@ -11,6 +11,8 @@ import gr.aueb.cf.schoolapp.mapper.Mapper;
 import gr.aueb.cf.schoolapp.model.Teacher;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class TeacherServiceImpl implements ITeacherService{
 
@@ -99,7 +101,25 @@ public class TeacherServiceImpl implements ITeacherService{
 
     @Override
     public List<TeacherReadOnlyDTO> getAllTeachers() throws TeacherDAOException {
-        return List.of();
+        List<Teacher> teachers;
+        try {
+            teachers = teacherDAO.getAll();
+
+            // Option 1
+//            return teachers.stream()
+//                    .map(Mapper::mapTeacherToReadOnlyDTO)
+//                    .flatMap(Optional::stream)
+//                    .collect(Collectors.toList());
+
+            // Option 2
+            return teachers.stream()
+                    .map(t -> Mapper.mapTeacherToReadOnlyDTO(t).orElse(null))
+                    .collect(Collectors.toList());
+
+        } catch (TeacherDAOException e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @Override
