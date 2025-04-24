@@ -85,7 +85,16 @@ public class TeacherServiceImpl implements ITeacherService{
 
     @Override
     public TeacherReadOnlyDTO getTeacherById(Integer id) throws TeacherDAOException, TeacherNotFoundException {
-        return null;
+        Teacher teacher;
+
+        try {
+            teacher = teacherDAO.getById(id);
+
+            return Mapper.mapTeacherToReadOnlyDTO(teacher).orElseThrow(() -> new TeacherNotFoundException(""));
+        } catch (TeacherDAOException | TeacherNotFoundException e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @Override
